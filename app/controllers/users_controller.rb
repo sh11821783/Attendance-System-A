@@ -62,6 +62,7 @@ class UsersController < ApplicationController
   end
   
   def edit_basic_info
+    @users = User.all
   end
 
   def update_basic_info # 更新

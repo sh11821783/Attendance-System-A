@@ -4,7 +4,7 @@
     <tr>
       <td><%= link_to "⇦前月", user_path(date: @first_day.prev_month), class: "btn" %>【<%= l(@first_day, format: :middle) %>】時間管理表 <%= link_to "次月⇨", user_path(date: @first_day.next_month) , class: "btn" %> </td>
       <!--app/helpers/users_helper.rbに定義済み-->
-      <td>指定勤務時間 : <%= format_basic_info(@user.work_time) %></td>
+      <td>指定勤務開始時間 <%= format_basic_info(@user.designated_work_start_time) %><br>指定勤務終了時間<%= format_basic_info(@user.designated_work_end_time) %></td>
       <!--app/helpers/users_helper.rbに定義済み-->
       <td colspan = "3">基本時間 : <%= format_basic_info(@user.basic_time) %></td>
       <!--app/helpers/attendances_helper.rbに定義済み-->
@@ -21,22 +21,47 @@
     </tr>
   </table>
 </div>
+
+<div>
+  <nav>
+    <ul class="menu-notice">
+      <li>【所属長承認申請のお知らせ】</li>
+      <li>【勤怠変更申請のお知らせ】</li>
+      <li>【残業申請のお知らせ】</li>
+    </ul>
+  </nav>
+</div>
 <!--勤怠編集ページに移動-->
 <div class="btn-users-show">
   <!--今回はparamsハッシュにdateキーとして、@first_dayを指定。これで受け取ったparams[:date]をもとに、どの月の情報を表示するか判断できる-->
-  <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-default" %>
+  <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-default" %> <%= link_to "csv出力", class: 'btn btn-default' %>
 </div>
+<diV>
+  <%= link_to "勤怠修正ログ （承認済）", class: 'btn btn-default' %>
+</diV>
 
 <div>
   <table class="table table-striped table-bordered table-hover" id="table-attendances">
     <thead>
       <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th colspan = "9">【実績】</th>
+        <th colspan = "9">所定外勤務</th>
+      </tr>
+      <tr>
+        <th rowspan = "2">残業申請</th>
         <th rowspan = "2">日付</th>
         <th rowspan = "2">曜日</th>
         <th colspan = "4">出社</th>
         <th colspan = "3">退社</th>
-        <th rowspan = "1">在社時間</th>
-        <th rowspan = "1">備考</th>
+        <th rowspan = "2">在社時間</th>
+        <th rowspan = "2">備考</th>
+        <th colspan = "2">終了予定時間</th>
+        <th rowspan = "2">時間外時間</th>
+        <th rowspan = "2">業務処理内容</th>
+        <th rowspan = "2">指示者確認</th>
       </tr>
       <tr>
         <th colspan = "1">時</th>
@@ -45,8 +70,8 @@
         <th>時</th>
         <th>分</th>
         <th></th>
-        <th></th>
-        <th></th>
+        <th>時</th>
+        <th>分</th>
       </tr>
     </thead>
 
@@ -65,6 +90,7 @@
           end
         %>
         <tr>
+          <td><%= link_to "残業申請", class: 'btn btn-default' %></td>
           <td><%= l(day.worked_on, format: :short) %></td> <!--日付-->
           <!--上記の土日色変えをここに反映させる。-->
           <td class="<%= css_class %>"><%= $days_of_the_week[day.worked_on.wday] %></td> <!--曜日-->
@@ -97,6 +123,11 @@
             <% end %>
           </td>
           <td><%= day.note %></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
         </tr>
       <% end %>
     </tbody>
@@ -106,19 +137,14 @@
         <td rowspan="2"></td>
         <td rowspan="2"></td>
         <td rowspan="2"></td>
+        <td rowspan="2" colspan="7"></td>
+        <td colspan="1">累計在社時間</td>
+        <td rowspan="2" colspan="5"></td>
         <td rowspan="2"></td>
-        <td rowspan="3"></td>
-        <td colspan="3">累計日数</td>
-        <td colspan="2">総合勤務時間</td>
-        <td colspan="2">累計在社時間</td>
       </tr>
       <tr>
-        <!--累計日数-->
-        <td colspan="3"><%= @attendances.count %></td>
-        <!--総合勤務時間-->
-        <td colspan="2"><%= format_basic_info(@user.work_time).to_f * @worked_sum %></td>
         <!--累計在社時間-->
-        <td><%= format("%.2f", @total_working_times.to_f) %></td>
+        <td colspan="1"><%= format("%.2f", @total_working_times.to_f) %></td>
       </tr>
     </tfoot>
   </table>

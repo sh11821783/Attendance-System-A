@@ -121,3 +121,12 @@ p {
   }
 }
 
+/* お知らせのメニュー */
+.menu-notice li {
+  list-style-type: none;
+}
+
+.menu-notice li:hover {
+  color:#888888;
+}
+
