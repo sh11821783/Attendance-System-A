@@ -75,6 +75,16 @@ class UsersController < ApplicationController
     end
     redirect_to users_url
   end
+  
+  # 勤怠変更申請(変更)
+  def edit_time_change_application
+    @user = User.find(params[:user_id])
+    @attendances = Attendance.where(instructor_confirmation: true)
+  end
+  # 勤怠変更申請(申請)
+  def update_time_change_application
+    @attendance = Attendance.find(params[:id])
+  end
 
   
   private
@@ -84,7 +94,12 @@ class UsersController < ApplicationController
     end
     
     def basic_info_params
-      params.require(:user).permit(:department, :basic_time, :work_time)
+      params.require(:user).permit(:designated_work_start_time, :designated_work_end_time, :basic_time, )
+    end
+    
+     # 勤怠変更申請
+    def time_change_application_params
+      params.require(:attendance).permit(:instructor_confirmation, :note)
     end
     
     def admin_or_correct_user

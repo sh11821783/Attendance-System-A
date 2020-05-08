@@ -19,6 +19,14 @@ Rails.application.routes.draw do
     end
     # onlyオプションで指定することで、updateアクション以外のルーティングを制限。
     # 勤怠データは、アップデートのみ。
-    resources :attendances, only: :update
+    resources :attendances, only: :update do
+      member do
+        get 'edit_overtime_info' # 残業申請ボタン〜残業申請一覧ページ（モーダル）
+        patch 'update_overtime_info' # 残業申請一覧ページ（モーダル）内の変更を送信〜更新
+      end
+    end
+    # 勤怠変更申請モーダルは特定のattendancesモデルの情報を求める必要性はないのでattendancesモデルから外してusersモデルのみの中に入れる。
+    get 'edit_time_change_application' # 勤怠変更申請モーダル
+    patch 'update_time_change_application' # 勤怠変更申請モーダル
   end
 end

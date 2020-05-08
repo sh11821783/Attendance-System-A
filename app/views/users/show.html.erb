@@ -15,7 +15,7 @@
       <td>所属 : <%= @user.affiliation.present? ? @user.affiliation : "未所属" %></td>
       <td>氏名 : <%= @user.name %></td>
       <td>コード</td>
-      <td></td>
+      <td><%= @user.employee_number %></td>
       <td>出勤日数 : <%= @worked_sum %>日</td>
       <td>絞め : <%= l(@last_day, format: :short) %></td> <!--config/locales/ja.ymlの40行目あたり-->
     </tr>
@@ -23,13 +23,15 @@
 </div>
 
 <div>
-  <nav>
-    <ul class="menu-notice">
-      <li>【所属長承認申請のお知らせ】</li>
-      <li>【勤怠変更申請のお知らせ】</li>
-      <li>【残業申請のお知らせ】</li>
-    </ul>
-  </nav>
+  <% if current_user.admin? %>
+    <nav>
+      <ul class="menu-notice">
+        <li>【所属長承認申請のお知らせ】</li>
+        <li>【勤怠変更申請のお知らせ】</li>
+        <li><%= link_to "【残業申請のお知らせ】", user_edit_time_change_application_path(@user), remote: true %></li>
+      </ul>
+    </nav>
+  <% end %>
 </div>
 <!--勤怠編集ページに移動-->
 <div class="btn-users-show">
@@ -64,8 +66,8 @@
         <th rowspan = "2">指示者確認</th>
       </tr>
       <tr>
-        <th colspan = "1">時</th>
-        <th colspan = "1">分</th>
+        <th>時</th>
+        <th>分</th>
         <th colspan = "2"></th>
         <th>時</th>
         <th>分</th>
@@ -90,7 +92,7 @@
           end
         %>
         <tr>
-          <td><%= link_to "残業申請", class: 'btn btn-default' %></td>
+          <td><%= link_to "残業申請", edit_overtime_info_user_attendance_path(@user,day), remote: true, class: 'btn btn-primary' %></td>
           <td><%= l(day.worked_on, format: :short) %></td> <!--日付-->
           <!--上記の土日色変えをここに反映させる。-->
           <td class="<%= css_class %>"><%= $days_of_the_week[day.worked_on.wday] %></td> <!--曜日-->
@@ -123,29 +125,42 @@
             <% end %>
           </td>
           <td><%= day.note %></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <!--終了予定時間の「時」-->
+          <td><%= format_hour(day.scheduled_end_time) if day.scheduled_end_time.present? %></td>
+          <!--終了予定時間の「分」-->
+          <td><%= format_min(day.scheduled_end_time) if day.scheduled_end_time.present? %></td>
+          <!--時間外時間-->
+          <td><%= overtime_info(day.scheduled_end_time, @user.designated_work_end_time) if day.scheduled_end_time.present? %></td>
+          <td><%= day.business_processing_content %></td>
+          <td><%= day.application if day.instructor_confirmation.present? %></td>
         </tr>
       <% end %>
     </tbody>
     
     <tfoot>
       <tr>
-        <td rowspan="2"></td>
-        <td rowspan="2"></td>
-        <td rowspan="2"></td>
-        <td rowspan="2" colspan="7"></td>
-        <td colspan="1">累計在社時間</td>
-        <td rowspan="2" colspan="5"></td>
-        <td rowspan="2"></td>
-      </tr>
-      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td colspan="7"></td>
         <!--累計在社時間-->
-        <td colspan="1"><%= format("%.2f", @total_working_times.to_f) %></td>
+        <td><%= format("%.2f", @total_working_times.to_f) %></td>
+        <td colspan="5"></td>
+        <td>
+          <form class="form-horizontal" action="/hoge/foo" method="post">
+            <label for="number" class="control-label">所属長承認　未</label>
+              <select class="form-control">
+                <option value="a">上長A</option>
+                <option value="b">上長B</option>
+              </select><br>
+            <button type="submit" class="btn btn-primary btn-block">申請</button>
+          </form>
+        </td>
       </tr>
     </tfoot>
   </table>
 </div>
+
+<!--モーダルウインドウ表示-->
+<div id="edit-overtime-info" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<div id="edit-time-change-application" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

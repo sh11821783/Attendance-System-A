@@ -17,10 +17,18 @@ ActiveRecord::Schema.define(version: 20200329014145) do
     t.datetime "started_at"
     t.datetime "finished_at"
     t.string "note"
-    t.time "scheduled_end_time" # 予定終了時間
-    t.string "business_processing_content" # 業務処理内容
-    t.string "instructor_confirmation" # 指示者確認
+    t.datetime "scheduled_end_time"
+    t.string "business_processing_content"
+    t.integer "instructor_confirmation", default: 0, null: false
+    t.boolean "tomorrow"
+    t.string "superior"
+    t.datetime "coming_to_work"
+    t.datetime "leaving_the_company"
+    t.boolean "change", default: false
     t.integer "user_id"
+    t.string "application"
+    t.string "attendance_edit_denial"
+    t.string "attendance_edit_approved"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_attendances_on_user_id"
@@ -29,19 +37,19 @@ ActiveRecord::Schema.define(version: 20200329014145) do
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "email"
-    t.string "affiliation" # 所属
-    t.integer "employee_number" # ユーザーの社員番号
-    t.string "uid" # ユーザーのカードID
+    t.string "affiliation"
+    t.integer "employee_number"
+    t.string "uid"
     t.time "basic_work_time"
-    t.datetime "designated_work_start_time", default: "2020-04-19 00:00:00" # ユーザーの指定業務開始時間
-    t.datetime "designated_work_end_time", default: "2020-04-19 09:00:00" # ユーザーの指定業務終了時間
-    t.datetime "basic_time", default: "2020-04-18 23:00:00" # 基本時間
-    t.boolean "superior" # 上長かどうかの真偽
-    t.datetime "created_at", null: false # 作成日
-    t.datetime "updated_at", null: false # 更新日
-    t.string "password_digest" # password記入
+    t.datetime "designated_work_start_time", default: "2020-05-08 00:00:00"
+    t.datetime "designated_work_end_time", default: "2020-05-08 09:00:00"
+    t.datetime "basic_time", default: "2020-05-07 23:00:00"
+    t.boolean "superior_flag"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "password_digest"
     t.string "remember_digest"
-    t.boolean "admin", default: false # 管理者かどうかの真偽
+    t.boolean "admin", default: false
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 

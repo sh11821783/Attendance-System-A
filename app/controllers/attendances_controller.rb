@@ -1,7 +1,8 @@
 class AttendancesController < ApplicationController
-  before_action :set_user, only: [:edit_one_month, :update_one_month]
-  before_action :logged_in_user, only: [:update, :edit_one_month]
-  before_action :admin_or_correct_user, only: [:edit, :update, :edit_one_month, :update_one_month]
+  before_action :set_user, only: [:edit_overtime_info, :update_overtime_info]
+  before_action :attendance, only: [:update_overtime_info]
+  before_action :logged_in_user, only: [:update, :edit_one_month, :edit_overtime_info, :update_overtime_info]
+  before_action :admin_or_correct_user, only: [:edit, :update, :edit_one_month, :update_one_month, :edit_overtime_info, :update_overtime_info]
   before_action :set_one_month, only: :edit_one_month
   before_action :finished_at_is_invalid?, only: :update_one_month
   
@@ -32,9 +33,11 @@ class AttendancesController < ApplicationController
   end
   
   def edit_one_month
+    @user = User.find(params[:id])
   end
   
   def update_one_month
+    @user = User.find(params[:id])
     ActiveRecord::Base.transaction do # トランザクションを開始。
     # データベースの操作を保障したい処理を以下に記述。
     # Attendanceモデルオブジェクトのidと、各カラムの値が入った更新するための情報であるitemを指す。
@@ -53,21 +56,79 @@ class AttendancesController < ApplicationController
     redirect_to attendances_edit_one_month_user_url(date: params[:date])
   end
   
+  # 残業申請
+  def edit_overtime_info
+    @attendance = Attendance.find(params[:id])
+  end
+  
+  # 残業申請
+  def update_overtime_info
+    @attendance = Attendance.find(params[:id])
+    
+    if params[:attendance][:scheduled_end_time].blank? && params[:attendance][:business_processing_content].blank?
+      flash[:danger] = "終了予定時間及び業務処理内容が空です。"
+      redirect_to user_url(@user) and return
+    end
+    
+    if params[:attendance][:scheduled_end_time].blank? # params[:a][:b] => a：　この場合「attendance」の中の b: 「scheduled_end_time」と言うふうに書く。
+      flash[:danger] = "終了予定時間が空です。"
+      redirect_to user_url(@user) and return # and return = 一つのアクションにつき「redirect_to」が2つ以上存在した場合、添付する。
+    end
+    
+    if params[:attendance][:business_processing_content].blank?
+      flash[:danger] = "業務処理内容が空です。"
+      redirect_to user_url(@user) and return # and return = 一つのアクションにつき「redirect_to」が2つ以上存在した場合、添付する。
+    end
+    
+    if params[:attendance][:instructor_confirmation].blank?
+      flash[:danger] = "指示者確認が空です。"
+      redirect_to user_url(@user) and return
+    end
+    
+    @attendance.application = "申請中"
+    
+    if @attendance.update_attributes(overtime_params)
+      # 更新成功時の処理
+      flash[:success] = "#{@user.name}の残業申請しました。"
+      redirect_to user_url(@user) and return
+    else
+      # 更新失敗時の処理
+      flash[:danger] = "#{@user.name}の申請は失敗しました。" + @user.errors.full_messages.join("、")
+      redirect_to user_url(@user) and return
+    end
+  end
+  
   private
+  
+    def set_user
+      @user = User.find(params[:user_id])
+    end
     # 1ヶ月分の勤怠情報を扱います。これが、itemに入っている。
     def attendances_params
       params.require(:user).permit(attendances: [:started_at, :finished_at, :note])[:attendances]
+    end
+    # 残業申請
+    def overtime_params
+      params.require(:attendance).permit(:scheduled_end_time, :tomorrow, :business_processing_content, :instructor_confirmation)
+    end
+    # 勤怠変更申請
+    def time_change_application_params
+      params.require(:attendance).permit(:instructor_confirmation, :note)
     end
     
     # beforeフィルター
 
     # 管理権限者、または現在ログインしているユーザーを許可。
     def admin_or_correct_user
-      @user = User.find(params[:user_id]) if @user.blank?
+      @user = User.find(params[:id]) if @user.blank?
       unless current_user?(@user) || current_user.admin?
         flash[:danger] = "編集権限がありません。"
         redirect_to(root_url)
       end  
+    end
+    
+    def attendance
+      @attendance = Attendance.new
     end
     
     def finished_at_is_invalid?

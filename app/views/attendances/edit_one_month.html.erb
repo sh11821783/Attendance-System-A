@@ -12,6 +12,7 @@
           <th>退勤時間</th>
           <th>在社時間</th>
           <th>備考</th>
+          <th>指示者確認印</th>
         </tr>
       </thead>
       <tbody>
@@ -33,7 +34,7 @@
               <td class="<%= css_class %>"><%= $days_of_the_week[day.worked_on.wday] %></td>
               <!--もし、現在のユーザー、且つ、現在の勤怠の日より日付が大きい時は-->
               <% if current_user && (Date.current < day.worked_on) %>
-              <!--出勤時間と退社時間を操作出来ないようにする。-->
+              <!--readonly: true　⇨　出勤時間と退社時間を操作出来ないようにする。-->
                 <td><%= attendance.time_field :started_at, readonly: true, class: "form-control" %></td>
                 <td><%= attendance.time_field :finished_at, readonly: true, class: "form-control" %></td>
               <% else %>
@@ -46,6 +47,7 @@
                 <% end %>
               </td>
               <td><%= attendance.text_field :note, class: "form-control" %></td>
+              <td><%= f.select :instructor_confirmation, [['上長A', 1], ['上長B', 2]], { include_blank: true, selected: 0 }, { id: "instructor_confirmation", class: "attendance_class" } %></td>
             </tr>
           <% end %>
         <% end %>

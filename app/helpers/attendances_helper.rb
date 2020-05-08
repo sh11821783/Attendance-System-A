@@ -11,9 +11,13 @@ module AttendancesHelper
     return false
   end
   # 就労時間。出勤時間と退勤時間を受け取り、在社時間を計算
-  def working_times(start, finish)
+  def working_times(start, finish) # ()内の引数はなんでもいい。
     # f = 小数点以下２桁
     format("%.2f", (((finish - start) / 60) / 60.0))
+  end
+  # 終了予定時間と指定勤務時間を引いて時間外時間を算出。
+  def overtime_info(finished_end_time, finish) # ()内の引数はなんでもいい。
+    format("%.2f", (((finished_end_time - finish) / 60) / 60.0))
   end
   
   def format_hour(time)

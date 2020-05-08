@@ -21,4 +21,8 @@ class Attendance < ApplicationRecord
       errors.add(:started_at, "より早い退勤時間は無効です") if started_at > finished_at
     end
   end
+  # 申請
+  #enum application:{
+     #"":0, "申請中":1, "勤怠編集承認済":2, "勤怠編集否認":3
+   #}
 end

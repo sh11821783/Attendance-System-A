@@ -20,7 +20,7 @@ class User < ApplicationRecord
   #affiliation（所属）が存在し、2文字以上かつ30文字以下で設定
   validates :affiliation, length: { in: 2..30 }, allow_blank: true # allow_blank: true　⇨　値が空文字""の場合バリデーションをスルー
   # （基本時間）所定労働時間にあたります（例： 8時間）
-  #validates :basic_time, presence: true
+  validates :basic_time, presence: true
   
   has_secure_password # AddPasswordDigestToUsersマイグレーションファイルに意味を記載。
   # 最小文字数（6文字以上は記入）、presence（存在の有無）、allow_nil: true（すでにログインしているので再度パスワードを打たなくえすむ）
