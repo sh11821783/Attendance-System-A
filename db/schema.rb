@@ -27,8 +27,6 @@ ActiveRecord::Schema.define(version: 20200329014145) do
     t.boolean "change", default: false
     t.integer "user_id"
     t.string "application"
-    t.string "attendance_edit_denial"
-    t.string "attendance_edit_approved"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_attendances_on_user_id"
@@ -41,10 +39,10 @@ ActiveRecord::Schema.define(version: 20200329014145) do
     t.integer "employee_number"
     t.string "uid"
     t.time "basic_work_time"
-    t.datetime "designated_work_start_time", default: "2020-05-08 00:00:00"
-    t.datetime "designated_work_end_time", default: "2020-05-08 09:00:00"
-    t.datetime "basic_time", default: "2020-05-07 23:00:00"
-    t.boolean "superior_flag"
+    t.datetime "designated_work_start_time", default: "2020-05-23 00:00:00"
+    t.datetime "designated_work_end_time", default: "2020-05-23 09:00:00"
+    t.datetime "basic_time", default: "2020-05-22 23:00:00"
+    t.boolean "superior_flag", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "password_digest"

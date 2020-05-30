@@ -28,7 +28,14 @@
       <ul class="menu-notice">
         <li>【所属長承認申請のお知らせ】</li>
         <li>【勤怠変更申請のお知らせ】</li>
-        <li><%= link_to "【残業申請のお知らせ】", user_edit_time_change_application_path(@user), remote: true %></li>
+         <% if @number_of_applications == 0 %>
+           <li>【残業申請のお知らせ】</li>
+         <% else %>
+           <li>
+             <%= link_to "【残業申請のお知らせ】", user_edit_overtime_application_information_path(@user), remote: true, :style=>"color:red;" %>
+              <b style="border:2px solid #F00; color: #F00"><%= @number_of_applications %>件の通知があります</b>
+           </li>
+         <% end %>
       </ul>
     </nav>
   <% end %>
@@ -63,7 +70,7 @@
         <th colspan = "2">終了予定時間</th>
         <th rowspan = "2">時間外時間</th>
         <th rowspan = "2">業務処理内容</th>
-        <th rowspan = "2">指示者確認</th>
+        <th rowspan = "2">指示者確認㊞</th>
       </tr>
       <tr>
         <th>時</th>
@@ -130,9 +137,9 @@
           <!--終了予定時間の「分」-->
           <td><%= format_min(day.scheduled_end_time) if day.scheduled_end_time.present? %></td>
           <!--時間外時間-->
-          <td><%= overtime_info(day.scheduled_end_time, @user.designated_work_end_time) if day.scheduled_end_time.present? %></td>
+          <td><%= overtime_info(day.scheduled_end_time, @user.designated_work_end_time, day.tomorrow, day) if day.scheduled_end_time.present? %></td>
           <td><%= day.business_processing_content %></td>
-          <td><%= day.application if day.instructor_confirmation.present? %></td>
+          <td><%= day.application %></td>
         </tr>
       <% end %>
     </tbody>
@@ -163,4 +170,4 @@
 
 <!--モーダルウインドウ表示-->
 <div id="edit-overtime-info" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
-<div id="edit-time-change-application" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<div id="edit-overtime-application-information" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

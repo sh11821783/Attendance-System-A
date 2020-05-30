@@ -26,7 +26,7 @@ Rails.application.routes.draw do
       end
     end
     # 勤怠変更申請モーダルは特定のattendancesモデルの情報を求める必要性はないのでattendancesモデルから外してusersモデルのみの中に入れる。
-    get 'edit_time_change_application' # 勤怠変更申請モーダル
-    patch 'update_time_change_application' # 勤怠変更申請モーダル
+    get 'edit_overtime_application_information' # 残業申請のお知らせモーダル
+    patch 'update_overtime_application_information' # 残業申請のお知らせモーダル
   end
 end

@@ -15,9 +15,19 @@ module AttendancesHelper
     # f = 小数点以下２桁
     format("%.2f", (((finish - start) / 60) / 60.0))
   end
-  # 終了予定時間と指定勤務時間を引いて時間外時間を算出。
-  def overtime_info(finished_end_time, finish) # ()内の引数はなんでもいい。
-    format("%.2f", (((finished_end_time - finish) / 60) / 60.0))
+  
+  # 終了予定時間1と指定勤務終了時間2を引いて時間外時間を算出。
+  # もし、boolean型のtomorrowがtrueではないなら
+  def overtime_info(end_time_1, end_time_2, tomorrow, day) # ()内の引数はなんでもいい。
+    @calc_designated_work_end_time = end_time_2.change(month: day.worked_on.month, day: day.worked_on.day)
+    @calc_scheduled_end_time = end_time_1.change(month: day.worked_on.month, day: day.worked_on.day)
+    unless tomorrow == true
+      # 通常の時間外計算。
+      format("%.2f", (((@calc_scheduled_end_time -  @calc_designated_work_end_time) / 60) / 60.0))
+    else
+      # 通常の時間外計算に+ 24時間を足す。
+      format("%.2f", (((@calc_scheduled_end_time - @calc_designated_work_end_time) / 60) / 60.0) + 24)
+    end
   end
   
   def format_hour(time)

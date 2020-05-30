@@ -1,8 +1,8 @@
 class AttendancesController < ApplicationController
-  before_action :set_user, only: [:edit_overtime_info, :update_overtime_info]
+  before_action :set_user, only: [:edit_one_month, :update_one_month]
   before_action :attendance, only: [:update_overtime_info]
   before_action :logged_in_user, only: [:update, :edit_one_month, :edit_overtime_info, :update_overtime_info]
-  before_action :admin_or_correct_user, only: [:edit, :update, :edit_one_month, :update_one_month, :edit_overtime_info, :update_overtime_info]
+  before_action :admin_or_correct_user, only: [:edit, :update, :edit_one_month, :update_one_month]
   before_action :set_one_month, only: :edit_one_month
   before_action :finished_at_is_invalid?, only: :update_one_month
   
@@ -58,11 +58,14 @@ class AttendancesController < ApplicationController
   
   # 残業申請
   def edit_overtime_info
+    @user = User.find(params[:user_id])
     @attendance = Attendance.find(params[:id])
+    @superior = User.where(superior_flag: true).where.not(id: @user)
   end
   
   # 残業申請
   def update_overtime_info
+    @user = User.find(params[:user_id])
     @attendance = Attendance.find(params[:id])
     
     if params[:attendance][:scheduled_end_time].blank? && params[:attendance][:business_processing_content].blank?
@@ -85,42 +88,37 @@ class AttendancesController < ApplicationController
       redirect_to user_url(@user) and return
     end
     
-    @attendance.application = "申請中"
+    if @attendance.instructor_confirmation.present?
+       @attendance.application = "残業申請中"
+    end
     
     if @attendance.update_attributes(overtime_params)
       # 更新成功時の処理
-      flash[:success] = "#{@user.name}の残業申請しました。"
+      flash[:success] = "#{@user.name}の残業申請完了しました。"
       redirect_to user_url(@user) and return
+      logger.debug @attendance.errors.inspect
     else
       # 更新失敗時の処理
-      flash[:danger] = "#{@user.name}の申請は失敗しました。" + @user.errors.full_messages.join("、")
+      flash[:danger] = "#{@user.name}の申請が失敗しました。" + @user.errors.full_messages.join("、")
       redirect_to user_url(@user) and return
     end
   end
   
   private
   
-    def set_user
-      @user = User.find(params[:user_id])
-    end
     # 1ヶ月分の勤怠情報を扱います。これが、itemに入っている。
     def attendances_params
       params.require(:user).permit(attendances: [:started_at, :finished_at, :note])[:attendances]
     end
     # 残業申請
     def overtime_params
-      params.require(:attendance).permit(:scheduled_end_time, :tomorrow, :business_processing_content, :instructor_confirmation)
+      params.require(:attendance).permit(:scheduled_end_time, :business_processing_content, :instructor_confirmation, :tomorrow)
     end
-    # 勤怠変更申請
-    def time_change_application_params
-      params.require(:attendance).permit(:instructor_confirmation, :note)
-    end
-    
     # beforeフィルター
 
     # 管理権限者、または現在ログインしているユーザーを許可。
     def admin_or_correct_user
-      @user = User.find(params[:id]) if @user.blank?
+      @user = User.find(params[:user_id]) if @user.blank?
       unless current_user?(@user) || current_user.admin?
         flash[:danger] = "編集権限がありません。"
         redirect_to(root_url)
