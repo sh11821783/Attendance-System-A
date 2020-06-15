@@ -16,17 +16,23 @@ ActiveRecord::Schema.define(version: 20200329014145) do
     t.date "worked_on"
     t.datetime "started_at"
     t.datetime "finished_at"
+    t.datetime "before_started_at"
+    t.datetime "before_finished_at"
+    t.datetime "edit_started_at"
+    t.datetime "edit_finished_at"
     t.string "note"
     t.datetime "scheduled_end_time"
     t.string "business_processing_content"
     t.integer "instructor_confirmation", default: 0, null: false
+    t.integer "instructor_confirmation_k", default: 0, null: false
+    t.integer "instructor_confirmation_ok", default: 0, null: false
     t.boolean "tomorrow"
-    t.string "superior"
-    t.datetime "coming_to_work"
-    t.datetime "leaving_the_company"
+    t.boolean "tomorrow_k"
     t.boolean "change", default: false
-    t.integer "user_id"
     t.string "application"
+    t.string "application_k"
+    t.string "application_ok"
+    t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_attendances_on_user_id"
@@ -39,9 +45,9 @@ ActiveRecord::Schema.define(version: 20200329014145) do
     t.integer "employee_number"
     t.string "uid"
     t.time "basic_work_time"
-    t.datetime "designated_work_start_time", default: "2020-05-23 00:00:00"
-    t.datetime "designated_work_end_time", default: "2020-05-23 09:00:00"
-    t.datetime "basic_time", default: "2020-05-22 23:00:00"
+    t.datetime "designated_work_start_time", default: "2020-06-13 00:00:00"
+    t.datetime "designated_work_end_time", default: "2020-06-13 09:00:00"
+    t.datetime "basic_time", default: "2020-06-12 23:00:00"
     t.boolean "superior_flag", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

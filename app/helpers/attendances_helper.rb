@@ -10,6 +10,7 @@ module AttendancesHelper
     end
     return false
   end
+  
   # 就労時間。出勤時間と退勤時間を受け取り、在社時間を計算
   def working_times(start, finish) # ()内の引数はなんでもいい。
     # f = 小数点以下２桁
@@ -21,12 +22,12 @@ module AttendancesHelper
   def overtime_info(end_time_1, end_time_2, tomorrow, day) # ()内の引数はなんでもいい。
     @calc_designated_work_end_time = end_time_2.change(month: day.worked_on.month, day: day.worked_on.day)
     @calc_scheduled_end_time = end_time_1.change(month: day.worked_on.month, day: day.worked_on.day)
-    unless tomorrow == true
+    if tomorrow == true
       # 通常の時間外計算。
-      format("%.2f", (((@calc_scheduled_end_time -  @calc_designated_work_end_time) / 60) / 60.0))
+      format("%.2f", (((@calc_scheduled_end_time -  @calc_designated_work_end_time) / 60) / 60.0) + 24)
     else
       # 通常の時間外計算に+ 24時間を足す。
-      format("%.2f", (((@calc_scheduled_end_time - @calc_designated_work_end_time) / 60) / 60.0) + 24)
+      format("%.2f", (((@calc_scheduled_end_time - @calc_designated_work_end_time) / 60) / 60.0))
     end
   end
   

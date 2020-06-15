@@ -34,15 +34,15 @@ class ApplicationController < ActionController::Base
 
   # set_one_month　⇨　ページ出力前に1ヶ月分のデータの存在を確認・取得します。
   def set_one_month
-    # もし @first_day = params[:date].nil?ならばDate.current.beginning_of_month
-    # そうでなければ、params[:date].to_date
-    @first_day = params[:date].nil? ?
-    Date.current.beginning_of_month : params[:date].to_date
+    # もし「params[:date].nil（dateが空）の時」「Date.current.beginning_of_month（今月の月初日）」に「params[:date].to_date（dateというパラメーター名）」を入れて
+    # @first_dayに代入。「beginning_of_month」は最初からあるメソッド。
+    @first_day = params[:date].nil? ? Date.current.beginning_of_month : params[:date].to_date
+    # 上記の「@first_day」に「end_of_month（月末）」を紐付け、その月の月末を「@last_day 」として定義。
     @last_day = @first_day.end_of_month
-    # これらのインスタンス変数を使って、1ヶ月分のオブジェクトが代入された配列を定義
+    # [*@first_day..@last_day]これで1ヶ月を表す。
     one_month = [*@first_day..@last_day] # 対象の月の日数を代入します。
     # ユーザーに紐付く一ヶ月分のレコードを検索し取得します。
-    # .order(:worked_on)　⇨　取得したAttendanceモデルの配列をworked_onの値をもとに昇順に並び替え
+    # .order(:worked_on)　⇨　取得したAttendanceモデルの配列をworked_on（日付）の値をもとに昇順に並び替え
     @attendances = @user.attendances.where(worked_on: @first_day..@last_day).order(:worked_on)
     
     # unless文は、条件式がfalseと評価された場合のみ、内部の処理を実行する。

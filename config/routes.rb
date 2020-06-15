@@ -25,8 +25,14 @@ Rails.application.routes.draw do
         patch 'update_overtime_info' # 残業申請一覧ページ（モーダル）内の変更を送信〜更新
       end
     end
+    # 所属長申請ボタン
+    patch 'update_one_month_application'
     # 勤怠変更申請モーダルは特定のattendancesモデルの情報を求める必要性はないのでattendancesモデルから外してusersモデルのみの中に入れる。
-    get 'edit_overtime_application_information' # 残業申請のお知らせモーダル
-    patch 'update_overtime_application_information' # 残業申請のお知らせモーダル
+    get 'edit_overtime_application_information' # 残業申請のお知らせモーダル（申請）
+    patch 'update_overtime_application_information' # 残業申請のお知らせモーダル（更新）
+    get 'edit_one_month_information' # 勤怠編集申請のお知らせモーダル（申請）
+    patch 'update_one_month_information' # 勤怠編集申請のお知らせモーダル（更新）
+    get 'edit_one_month_application_information' # 所属長申請承認のお知らせモーダル(申請)
+    patch 'update_one_month_application_information' # 所属長申請承認のお知らせモーダル（更新）
   end
 end
