@@ -67,4 +67,24 @@ class User < ApplicationRecord
       all #全て表示。User.は省略
     end
   end
+  
+  # csvインポート
+  def self.import(file)
+    num = 0
+    CSV.foreach(file.path, 'r:cp932:utf-8', headers: true) do |row|
+
+      user = new
+      
+      user.attributes = row.to_hash.slice(*updatable_attributes)
+
+      if user.save
+         num += 1
+      end
+    end
+    num
+  end
+  # インポートするカラム
+  def self.updatable_attributes
+    ["name","email","affiliation","employee_number","uid","basic_work_time","designated_work_start_time","designated_work_end_time","superior_flag","admin","password"]
+  end
 end

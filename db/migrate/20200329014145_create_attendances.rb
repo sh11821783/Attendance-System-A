@@ -8,6 +8,8 @@ class CreateAttendances < ActiveRecord::Migration[5.1]
       t.datetime :before_finished_at # 変更前退社時間
       t.datetime :edit_started_at # 勤怠編集用出社時間（変更後）
       t.datetime :edit_finished_at # 勤怠編集用退社時間（変更後）
+      t.datetime :start_year # 最初の年
+      t.datetime :end_year # 最後の年
       t.string :note
       t.datetime :scheduled_end_time # 終了予定時間
       t.string :business_processing_content # 業務処理内容

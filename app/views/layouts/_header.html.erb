@@ -8,6 +8,12 @@
         <% if logged_in? %> <!--helpers/sessionshelperファイルに定義している-->
           <% if current_user.admin? %>
             <li><%= link_to "ユーザー一覧", users_path %></li>
+            <li><%= link_to "出勤社員一覧", list_of_employees_at_work_index_path %></li>
+            <li>
+              <% if current_user.admin? || current_user.superior_flag == true %>
+                <%= link_to "拠点情報の修正", bases_path %>
+              <% end %>
+            </li>
             <li><%= link_to '基本情報の修正', edit_basic_info_user_path(current_user) %></li>
           <% end %>
           <li class="dropdown">

@@ -24,7 +24,7 @@
 </div>
 
 <div>
-  <% if current_user.admin? %>
+  <% if @user.superior_flag == true %>
     <nav>
       <ul class="menu-notice">
         <% if  @number_manager_approval_application == 0 %>
@@ -58,10 +58,10 @@
 <!--勤怠編集ページに移動-->
 <div class="btn-users-show">
   <!--今回はparamsハッシュにdateキーとして、@first_dayを指定。これで受け取ったparams[:date]をもとに、どの月の情報を表示するか判断できる-->
-  <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-default" %> <%= link_to "csv出力", class: 'btn btn-default' %>
+  <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: 'btn btn-primary' %> <%= link_to "CSV出力", user_path(format: :csv), class: "btn btn-primary" %>
 </div>
 <diV>
-  <%= link_to "勤怠修正ログ （承認済）", class: 'btn btn-default' %>
+  <%= link_to "勤怠修正ログ （承認済）", user_attendance_record_path(@user), remote: true, class: 'btn btn-primary' %>
 </diV>
 
 <div>
@@ -214,7 +214,7 @@
 <div id="edit-overtime-application-information" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 <div id="edit-one-month-information" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 <div id="edit-one-month-application-information" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
-
+<div id="attendance-record" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 
 
 <!--もし、現在のユーザーとログインしているユーザーが違う場合ボタン表示なし-->
@@ -344,14 +344,19 @@
         <td><%= format("%.2f", @total_working_times.to_f) %></td>
         <td colspan="5"></td>
         <td>
-          <form class="form-horizontal" action="/hoge/foo" method="post">
-            <label for="number" class="control-label">所属長承認　未</label>
-              <select class="form-control">
-                <option value="a">上長A</option>
-                <option value="b">上長B</option>
-              </select><br>
-            <button type="submit" class="btn btn-primary btn-block">申請</button>
-          </form>
+          <%= form_with(model: @attendances, url: user_update_one_month_application_path(@user), method: :patch, local: true) do |f| %>
+            <!--更新するレコードのパラメーターに「first_day」という名前にして「value （値）」「@first_day（月初日は、application_controller.rb）」を入れる-->
+            <%= f.hidden_field :first_day, :value => @first_day %>
+            <% if @superior_flag.application_ok == nil %>
+              所属長承認 未
+            <% elsif @superior_flag.application_ok == "申請中" %>
+              <% superior = User.find(@superior_flag.instructor_confirmation_ok) %>
+              <%= superior.name %>に<%= @superior_flag.application_ok %>
+            <% else %>
+              <% superior = User.find(@superior_flag.instructor_confirmation_ok) %>
+              <%= superior.name %>から<%= @superior_flag.application_ok %>済み
+            <% end %>
+          <% end %>
         </td>
       </tr>
     </tfoot>
@@ -361,4 +366,6 @@
 <!--モーダルウインドウ表示-->
 <div id="edit-overtime-info" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 <div id="edit-overtime-application-information" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<div id="edit-one-month-information" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<div id="edit-one-month-application-information" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 <% end %>

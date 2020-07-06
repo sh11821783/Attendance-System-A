@@ -13,7 +13,6 @@ User.create!(name: "上長A",
              password: "password",
              password_confirmation: "password",
              # db/migrate/[timestamp]_add_superior_flag_to_users.rbにsuperior_flagをデフォルトでfalseにする。
-             admin: true, # 管理者権限を与える。
              superior_flag: true, # 上長権限を与える。
              employee_number: "0001")
              
@@ -21,11 +20,11 @@ User.create!(name: "上長B",
              email: "sample-02@email.com",
              password: "password",
              password_confirmation: "password",
-             admin: true, # 管理者権限を与える。
              # db/migrate/[timestamp]_add_superior_flag_to_users.rbにsuperior_flagをデフォルトでfalseにする。
              superior_flag: true, # 上長権限を与える。
              employee_number: "0002")
              
+
 60.times do |n|
   name  = Faker::Name.name
   email = "sample-#{n+1}@email.com"
@@ -37,3 +36,4 @@ User.create!(name: "上長B",
                password_confirmation: password,
                employee_number: employee_number)
 end
+

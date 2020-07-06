@@ -3,12 +3,10 @@ class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
   # [:index, :show, :edit, :update, :destroy]にいく際は、すでにログインしているユーザーのみ
   before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :edit_overtime_application_information, :update_overtime_application_information, :edit_one_month_information, :edit_one_month_application_information]
-  # 現在ログインしているユーザーのみ[:edit, :update]できる。
-  before_action :correct_user, only: [:edit, :update]
+
+  before_action :admin_or_correct_user, only: [:show, :edit, :update]
   
-  before_action :admin_or_correct_user, only: :show
-  
-  before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info, :edit_overtime_application_information, :update_overtime_application_information, :edit_one_month_information, :edit_one_month_application_information]
+  before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info, :edit_overtime_application_information, :update_overtime_application_information, :edit_one_month_information, :edit_one_month_application_information, :index]
   
   before_action :set_one_month, only: :show
   
@@ -21,6 +19,23 @@ class UsersController < ApplicationController
   def index
     # @users = User.allから下記に置き換え
     @users = User.paginate(page: params[:page]).search(params[:search]) # 名前検索フォームに必須。
+    @users_ex = User.all
+    respond_to do |format|
+      format.html
+      format.csv do
+        send_data render_to_string, filename: "users.csv", type: :csv
+      end
+    end
+  end
+  
+  def import
+    if params[:csv_file].blank?
+      flash[:danger] = '読み込むCSVを選択してください'
+    else
+      num = User.import(params[:csv_file])
+      flash[:danger] = "#{ num.to_s }件のデータ情報を追加/更新しました"
+    end
+    redirect_to action: 'index'
   end
   
   def show # ユーザーの勤怠ページ
@@ -30,7 +45,7 @@ class UsersController < ApplicationController
     @superior_flag = @user.attendances.find_by(worked_on: @first_day)
     # 申請数(上長を選んで、且つ、申請中のユーザー)
     if @user.superior_flag == true
-      # お知らせモーダルの件数確認は、「申請された上長本人」が確認できればいいので、「申請中」と「指示者確認が自分」であることを定義する。
+      # お知らせモーダルの件数確認は、「申請された上長本人」が申請数を確認できればいいので、「申請中」と「指示者確認が自分」であることを定義する。
       @number_of_applications = Attendance.where(instructor_confirmation: @user.id, application: "申請中").count
     end
     # 勤怠変更申請
@@ -40,6 +55,17 @@ class UsersController < ApplicationController
     # 「所属長承認申請のお知らせ」の件数
     if @user.superior_flag == true
       @number_manager_approval_application = Attendance.where(instructor_confirmation_ok: @user.id, application_ok: "申請中").count
+    end
+    
+    @users = User.all
+    respond_to do |format|
+      format.html do
+          #html用の処理を書く
+      end 
+      format.csv do
+        #csv用の処理を書く
+        send_data render_to_string, filename: "勤怠一覧表.csv", type: :csv
+      end
     end
   end
   
@@ -80,7 +106,7 @@ class UsersController < ApplicationController
       ActiveRecord::Base.transaction do # トランザクションを開始。
         # データベースの操作を保障したい処理を以下に記述。
         # Attendanceモデルオブジェクトのidと、各カラムの値が入った更新するための情報であるitemを指す。
-        # 下記のコードでストロングパラメーターのカラムを取り出し、ここではいくつも残業申請者のレコードを一つ一つ更新するため、eachで回す。
+        # 下記��コードでストロングパラメーターのカラムを取り出し、ここではいくつも残業申請者のレコードを一つ一つ更新するため、eachで回す。
         one_month_application_information_params.each do |id, item|
           if item[:change] == "true"
             attendance = Attendance.find(id)
@@ -119,36 +145,40 @@ class UsersController < ApplicationController
     end
   end
   
-  def edit # 編集
-    # @user = User.find(params[:id])
+  def edit # 編集@user = User.find(params[:id])
   end
   
   def update # 更新
     # @user = User.find(params[:id])
     # .update_attributes(user_params)　⇨　(user_params)を更新し、保存する。
     if @user.update_attributes(user_params)
-      # 更新に成功した場合の処理を記述します。
-      flash[:success] = "ユーザー情報を更新しました。"
-      redirect_to @user
+      #updateが完了したら一覧ページへリダイレクト
+      flash[:success] = "編集完了しました。"
+      redirect_to users_path
     else
-      render :edit      
+       #updateを失敗すると編集ページへ
+      flash[:danger] = "編集に失敗しました。"
+      render 'index'
     end
   end
   
   def destroy
+    # 管理者のみ削除可能
     @user.destroy
     flash[:success] = "#{@user.name}のデータを削除しました。"
     redirect_to users_url
   end
   
+  # 基本情報及びユーザー一覧の編集
   def edit_basic_info
     @users = User.all
   end
 
   def update_basic_info # 更新
+    # 管理者のみ編集可能
     if @user.update_attributes(basic_info_params)
       # 更新成功時の処理
-      flash[:success] = "#{@user.name}の基本情報を更新しました。"
+      flash[:success] = "#{@user.name}の情報を更新しました。"
     else
       # 更新失敗時の処理
       flash[:danger] = "#{@user.name}の更新は失敗しました。<br>" + @user.errors.full_messages.join("<br>")
@@ -185,7 +215,7 @@ class UsersController < ApplicationController
             attendance = Attendance.find(id)
             user = User.find(id)
             if item[:application] == "なし"
-              # 下記の定義は、「残業申請のお知らせ」モーダルの各種項目がそれぞれ「nil」だった場合を指す。
+              # 下記の定義は、「残業申請のお知らせ」モーダルの各種項目がそれぞれ「nil」だった場��を指す。
               item[:change] = "false"
               item[:application] = nil
               attendance.scheduled_end_time = nil
@@ -269,16 +299,34 @@ class UsersController < ApplicationController
     flash[:danger] = "無効な入力データがあった為、更新をキャンセルしました。"
     redirect_to user_path(@user)
   end
+  
+  # 勤怠ログ
+  def attendance_record
+    @user = User.find(params[:user_id])
+    
+    if params["select_year(1i)"].present? && params["select_month(2i)"].present? #&& params["select_month(3i)"].present?
+      # パラメーターで2020-06-01というスタイルで表示されていたので、コードもそれに合わせてやる。
+      select_day = params["select_year(1i)"] + "-" + 
+        # パラメーター上では、月日は「6」や「１」というふうに出ていたので上記のスタイルに合わせて比較させるので以下のよいうにフォーマットを合わせている。
+        format("%02d", params["select_month(2i)"]) + "-" + 
+        format("%02d", params["select_month(3i)"])
+      @first_day = select_day.to_date.beginning_of_month
+    else
+      @first_day = Date.today.to_date.beginning_of_month
+    end
+    @last_day = @first_day.end_of_month
+    @attendance_ok_user =  @user.attendances.where(application_k: "承認", worked_on: @first_day..@last_day).order(worked_on: "ASC")
+  end
 
   
   private
     # ストロングパラメーター　⇨　permit内のカラムをそれぞれ許可し、それ以外は許可しないよう設定。
     def user_params
-      params.require(:user).permit(:name, :email, :affiliation, :password, :password_confirmation)
+      params.require(:user).permit(:name, :email,:uid, :affiliation, :password,:employee_number, :password_confirmation, :basic_work_time, :designated_work_start_time, :designated_work_end_time)
     end
     
     def basic_info_params
-      params.require(:user).permit(:designated_work_start_time, :designated_work_end_time, :basic_time)
+      params.require(:user).permit(:name, :email,:uid, :affiliation, :password,:employee_number, :password_confirmation, :basic_work_time, :designated_work_start_time, :designated_work_end_time)
     end
     
     # 残業申請情報

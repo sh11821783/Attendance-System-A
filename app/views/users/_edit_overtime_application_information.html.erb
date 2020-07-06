@@ -13,7 +13,7 @@
         <!-- コントローラーで定義したuser_idの箱を取り出す。idはuser_idで、attendanncesはuser_idの残業申請中の情報が入っている。 %>
         <% @attendances.each do |id, attendances| %>
           <!--day(@attendances)のuser_idで、user(Userモデルの全てのuser)のidと一致するものを選択してきてuserに代入で、一致したレコードが取り出せる。-->
-          <center>【<%= User.find(id).name  %>からの残業申請】</center>
+          <center>【<%= User.find(id).name %>からの残業申請】</center>
           <table class="table table-bordered table-striped table-condensed">
           <!--各フォームのinputタグのname属性にattendances[id][カラム名]という形式で展開されるようになる。-->
             <thead>
