@@ -218,7 +218,7 @@
 
 
 <!--もし、現在のユーザーとログインしているユーザーが違う場合ボタン表示なし-->
-<% elsif current_user != @user %>
+<% elsif current_user.superior_flag == true %>
 <% provide(:title, @user.name) %>
 <div>
   <table class="table table-bordered table-condensed user-table">

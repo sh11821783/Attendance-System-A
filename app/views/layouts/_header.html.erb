@@ -22,7 +22,9 @@
             </a>
             <ul class="dropdown-menu">
               <!--current_user　⇨　helpers/sessionshelperファイルに定義している-->
-              <li><%= link_to "勤怠", current_user %></li>
+              <% if !current_user.admin? %>
+                <li><%= link_to "勤怠", current_user %></li>
+              <% end %>
               <!--(current_user)　⇨　現在ログイン中のユーザーIDをリソースに当てはめて判断する。-->
               <li><%= link_to "設定", edit_user_path(current_user) %></li>
               <li class="divider"></li>

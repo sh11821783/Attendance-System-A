@@ -49,9 +49,17 @@ class AttendancesController < ApplicationController
         attendance = Attendance.find(id)
         # itemの中にある「instructor_confirmation_k 勤怠変更申請用の指示者確認」に値が入っていたらitem[:application_k] = "申請中"
         if item[:instructor_confirmation_k].present?
+          if item[:edit_started_at].blank? && item[:edit_finished_at].present?
+            flash[:danger] = "出社時間を入力して下さい。"
+            redirect_to attendances_edit_one_month_user_path(@user) and return
+          end
           # もし、「退勤が空」且つ「出勤が存在した場合」
           if item[:edit_started_at].present? && item[:edit_finished_at].blank?
             flash[:danger] = "退勤時間を入力して下さい。"
+            redirect_to attendances_edit_one_month_user_path(@user) and return
+          end
+          if item[:edit_started_at] > item[:edit_finished_at]
+            flash[:danger] = "出社時間が退勤時間より大きいです。入力し直して下さい。"
             redirect_to attendances_edit_one_month_user_path(@user) and return
           end
           if item[:note].blank?

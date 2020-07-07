@@ -33,6 +33,10 @@ class ApplicationController < ActionController::Base
         redirect_to(root_url)
       end  
   end
+  
+  def superior_user
+     redirect_to root_url unless current_user.superior_flag?
+  end
 
 
   # set_one_month　⇨　ページ出力前に1ヶ月分のデータの存在を確認・取得します。

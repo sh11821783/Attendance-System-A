@@ -4,7 +4,7 @@ class CreateUsers < ActiveRecord::Migration[5.1]
       t.string :name
       t.string :email
       t.string :affiliation, comment: "所属"
-      t.integer :employee_number, comment: "ユーザーの社員番号"
+      t.string :employee_number, comment: "ユーザーの社員番号"
       t.string :uid, comment: "ユーザーカードのID"
       t.time :basic_work_time, comment: "ユーザーの基本勤務時間"
       t.datetime :designated_work_start_time, default: Time.current.change(hour: 9, min: 0, sec: 0), comment: "指定勤務開始時間"

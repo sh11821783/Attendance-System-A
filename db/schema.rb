@@ -52,12 +52,12 @@ ActiveRecord::Schema.define(version: 20200624121145) do
     t.string "name"
     t.string "email"
     t.string "affiliation"
-    t.integer "employee_number"
+    t.string "employee_number"
     t.string "uid"
     t.time "basic_work_time"
-    t.datetime "designated_work_start_time", default: "2020-06-30 00:00:00"
-    t.datetime "designated_work_end_time", default: "2020-06-30 09:00:00"
-    t.datetime "basic_time", default: "2020-06-29 23:00:00"
+    t.datetime "designated_work_start_time", default: "2020-07-07 00:00:00"
+    t.datetime "designated_work_end_time", default: "2020-07-07 09:00:00"
+    t.datetime "basic_time", default: "2020-07-06 23:00:00"
     t.boolean "superior_flag", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
