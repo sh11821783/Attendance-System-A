@@ -29,7 +29,6 @@
           </div>
           <td>
              <div id="<%= user.id %>" class="collapse">
-             <table class="table table-bordered table-striped table-status" id="table-attendances">
                <%= form_with(model: user, url: update_basic_info_user_path(user), local: true) do |f| %>
                  <table class="table table-bordered table-striped table-status" id="table-attendances">
                   <tbody class="card card-body">
@@ -68,7 +67,6 @@
                   </tbody>
                  </table>
               <% end %>
-            </table>
             </div>
           </td>
         </tr>
