@@ -20,7 +20,7 @@ class UsersController < ApplicationController
   
   def index
     # @users = User.allから下記に置き換え
-    @users = User.order("ASC").paginate(page: params[:page]).search(params[:search]) # 名前検索フォームに必須。
+    @users = User.paginate(page: params[:page]).order(id: "ASC")#.search(params[:search]) # 名前検索フォームに必須。
     respond_to do |format|
       format.html
       format.csv do
