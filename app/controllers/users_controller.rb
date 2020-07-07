@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   # 共通している部分@user = User.find(params[:id])をまとめた。追加したedit_basic_infoとupdate_basic_infoをログインユーザーかつ管理権限者のみが実行できるようフィルタリング設定。
   before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
   # [:index, :show, :edit, :update, :destroy]にいく際は、すでにログインしているユーザーのみ
-  before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :edit_overtime_application_information, :update_overtime_application_information, :edit_one_month_information, :edit_one_month_application_information]
+  before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy, :edit_basic_info, :edit_overtime_application_information, :update_overtime_application_information, :edit_one_month_information, :edit_one_month_application_information]
 
   before_action :admin_or_correct_user, only: [:edit, :update]
   
@@ -20,8 +20,7 @@ class UsersController < ApplicationController
   
   def index
     # @users = User.allから下記に置き換え
-    @users = User.paginate(page: params[:page]).search(params[:search]) # 名前検索フォームに必須。
-    @users_ex = User.all
+    @users = User.order(id: "ASC").paginate(page: params[:page]).search(params[:search]) # 名前検索フォームに必須。
     respond_to do |format|
       format.html
       format.csv do
