@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       patch 'update_basic_info'
       get 'attendances/edit_one_month' # 勤怠編集ページのルーティング
       patch 'attendances/update_one_month' # 勤怠編集ページをまとめて更新する為のルーティング。
+      get 'attendance_confirmation' # 一ヶ月分勤怠確認画面ボタン
     end
     # user情報のcsvインポート
     collection { post :import }

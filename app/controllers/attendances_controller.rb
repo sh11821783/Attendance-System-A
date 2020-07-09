@@ -55,11 +55,11 @@ class AttendancesController < ApplicationController
           end
           # もし、「退勤が空」且つ「出勤が存在した場合」
           if item[:edit_started_at].present? && item[:edit_finished_at].blank?
-            flash[:danger] = "退勤時間を入力して下さい。"
+            flash[:danger] = "退社時間を入力して下さい。"
             redirect_to attendances_edit_one_month_user_path(@user) and return
           end
           if item[:edit_started_at] > item[:edit_finished_at]
-            flash[:danger] = "出社時間が退勤時間より大きいです。入力し直して下さい。"
+            flash[:danger] = "出社時間が退社時間より大きいです。入力し直して下さい。"
             redirect_to attendances_edit_one_month_user_path(@user) and return
           end
           if item[:note].blank?

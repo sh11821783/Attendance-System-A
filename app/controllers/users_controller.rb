@@ -1,16 +1,16 @@
 class UsersController < ApplicationController
   # 共通している部分@user = User.find(params[:id])をまとめた。追加したedit_basic_infoとupdate_basic_infoをログインユーザーかつ管理権限者のみが実行できるようフィルタリング設定。
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
+  before_action :set_user, only: [:show, :attendance_confirmation, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
   # [:index, :show, :edit, :update, :destroy]にいく際は、すでにログインしているユーザーのみ
   before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy, :edit_basic_info, :edit_overtime_application_information, :update_overtime_application_information, :edit_one_month_information, :edit_one_month_application_information]
 
   before_action :admin_or_correct_user, only: [:edit, :update]
   
-  before_action :superior_user, only: [:show]
-  
   before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info, :index]
   
-  before_action :set_one_month, only: :show
+  before_action :not_admin_user, only: [:show]
+  
+  before_action :set_one_month, only: [:show, :attendance_confirmation]
   
 
   
@@ -67,6 +67,27 @@ class UsersController < ApplicationController
         #csv用の処理を書く
         send_data render_to_string, filename: "勤怠一覧表.csv", type: :csv
       end
+    end
+  end
+  
+  # お知らせモーダルの勤怠確認ボタン
+  def attendance_confirmation
+    @user = User.find(params[:id])
+    @worked_sum = @attendances.where.not(started_at: nil).count
+    @superior = User.where(superior_flag: true).where.not(id: @user)
+    @superior_flag = @user.attendances.find_by(worked_on: @first_day)
+    # 申請数(上長を選んで、且つ、申請中のユーザー)
+    if @user.superior_flag == true
+      # お知らせモーダルの件数確認は、「申請された上長本人」が申請数を確認できればいいので、「申請中」と「指示者確認が自分」であることを定義する。
+      @number_of_applications = Attendance.where(instructor_confirmation: @user.id, application: "申請中").count
+    end
+    # 勤怠変更申請
+    if @user.superior_flag == true
+      @number_of_time_change_application = Attendance.where(instructor_confirmation_k: @user.id, application_k: "申請中").count
+    end
+    # 「所属長承認申請のお知らせ」の件数
+    if @user.superior_flag == true
+      @number_manager_approval_application = Attendance.where(instructor_confirmation_ok: @user.id, application_ok: "申請中").count
     end
   end
   
@@ -214,13 +235,11 @@ class UsersController < ApplicationController
         overtime_application_information_params.each do |id, item|
           if item[:change] == "true"
             attendance = Attendance.find(id)
-            user = User.find(id)
             if item[:application] == "なし"
               # 下記の定義は、「残業申請のお知らせ」モーダルの各種項目がそれぞれ「nil」だった場��を指す。
               item[:change] = "false"
               item[:application] = nil
               attendance.scheduled_end_time = nil
-              user.designated_work_end_time = nil
               attendance.business_processing_content = nil
               attendance.application = nil
             end

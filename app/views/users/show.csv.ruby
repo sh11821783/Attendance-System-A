@@ -7,12 +7,12 @@ CSV.generate do |csv|
     column_values = [
       attendance.worked_on,
       if attendance.started_at.present?
-        l(attendance.started_at, format: :time)
+        l(attendance.started_at.floor_to(15.minutes), format: :time)
       else
         ""
       end,
       if attendance.finished_at.present?
-        l(attendance.finished_at, format: :time)
+        l(attendance.finished_at.floor_to(15.minutes), format: :time)
       else
         ""
       end,

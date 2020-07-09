@@ -33,10 +33,10 @@
             <tbody>
               <tr>
                 <td><%= at.worked_on if at.worked_on.present? %></td>
-                <td><%= l(at.before_started_at, format: :time) if at.before_started_at.present? %></td>
-                <th><%= l(at.before_finished_at, format: :time) if at.before_finished_at.present? %></th>
-                <th><%= l(at.started_at, format: :time) if at.started_at.present? %></th>
-                <th><%= l(at.finished_at, format: :time) if at.finished_at.present? %></th>
+                <td><%= l(at.before_started_at.floor_to(15.minutes), format: :time) if at.before_started_at.present? %></td>
+                <th><%= l(at.before_finished_at.floor_to(15.minutes), format: :time) if at.before_finished_at.present? %></th>
+                <th><%= l(at.started_at.floor_to(15.minutes), format: :time) if at.started_at.present? %></th>
+                <th><%= l(at.finished_at.floor_to(15.minutes), format: :time) if at.finished_at.present? %></th>
                 <th><%= User.find(at.instructor_confirmation_k).name if at.instructor_confirmation_k.present? %></th>
                 <th><%= l(at.updated_at, format: :middle) if at.updated_at.present? %></th>
               </tr>

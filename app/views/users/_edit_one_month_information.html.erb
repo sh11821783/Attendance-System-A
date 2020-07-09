@@ -67,7 +67,7 @@
                     <td><%= day.note %></td>
                     <td><%= d.select :application_k, [['なし'], ['申請中'], ['承認'], ['否認']], { include_blank: false, selected: 1 }, { id: "application", class: "attendance_class" } %></td>
                     <td><%= d.check_box :change , {}, "true", "false" %></td>
-                    <td><%= link_to "確認", user_path(day.user_id), class: "btn btn-primary" %></td>
+                    <td><%= link_to "確認", attendance_confirmation_user_path(day.user_id), class: "btn btn-primary" %></td>
                   </tr>
                   </tbody>
                 <% end %>
