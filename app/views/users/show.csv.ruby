@@ -1,7 +1,7 @@
 require 'csv'
 
 CSV.generate do |csv|
-  column_names = %w(worked_on started_at finished_at note business_processing_content)
+  column_names = %w(日付 出社時間 退社時間 備考 業務処理内容)
   csv << column_names
   @attendances.each do |attendance|
     column_values = [

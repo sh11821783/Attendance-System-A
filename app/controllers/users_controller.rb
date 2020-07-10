@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   # [:index, :show, :edit, :update, :destroy]にいく際は、すでにログインしているユーザーのみ
   before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy, :edit_basic_info, :edit_overtime_application_information, :update_overtime_application_information, :edit_one_month_information, :edit_one_month_application_information]
 
-  before_action :admin_or_correct_user, only: [:edit, :update]
+  before_action :admin_or_correct_user, only: [:edit, :update, :show]
   
   before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info, :index]
   
